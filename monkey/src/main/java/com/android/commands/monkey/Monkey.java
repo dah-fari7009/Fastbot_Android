@@ -372,6 +372,11 @@ public class Monkey {
     private long mRunningMillis = -1;
 
     /**
+     * Dynamic timeout
+     */
+    private boolean dynamicTimeout = false;
+
+    /**
      * Monkey test end time
      */
     private long mEndTime;
@@ -988,6 +993,9 @@ public class Monkey {
                         String logFile = nextOptionData();
                         Config.set("max.replayLog", logFile);
                         break;
+                    case "--dyn-timeout":
+                        dynamicTimeout = true;
+                        break;
                     case "--running-minutes":
                         mRunningMillis = nextOptionLong("Running Minutes") * ONE_MINUTE_IN_MILLISECOND;
                         break;
@@ -1401,9 +1409,16 @@ public class Monkey {
                 }
             } else {
                 currentTime = SystemClock.elapsedRealtime();
-                if (currentTime > mEndTime) {
+                if(dynamicTimeout)
+                    mEndTime = mEventSource.getLastReachedTime() + mRunningMillis;
+                /*if (currentTime > mEndTime) { //TODO: should update endTime everytime we find new target
+                    break;
+                }*/
+                if (currentTime >= mEndTime){
+                    Logger.println("Timeout: been over "+ (mRunningMillis/ONE_MINUTE_IN_MILLISECOND) +" minutes since last activity reached ...");
                     break;
                 }
+                    
             }
 
             synchronized (this) {

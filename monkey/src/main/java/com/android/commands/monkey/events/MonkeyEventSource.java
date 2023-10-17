@@ -24,6 +24,8 @@ import com.android.commands.monkey.events.MonkeyEvent;
  * event source interface
  */
 public interface MonkeyEventSource {
+     
+
     /**
      * @return the next monkey event from the source
      */
@@ -43,4 +45,7 @@ public interface MonkeyEventSource {
      * file can not open from script source etc
      */
     public boolean validate();
+
+
+    public long getLastReachedTime();
 }

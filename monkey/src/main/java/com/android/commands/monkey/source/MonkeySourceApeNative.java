@@ -228,6 +228,11 @@ public class MonkeySourceApeNative implements MonkeyEventSource {
     private int appRestarted = 0;
     private boolean fullFuzzing = true;
 
+    /**
+     * last time an activity was reached
+     */
+    public static long LAST_REACHED_TIME = SystemClock.elapsedRealtime();
+
 
     public MonkeySourceApeNative(Random random, List<ComponentName> MainApps,
                                  long throttle, boolean randomizeThrottle, boolean permissionTargetSystem,
@@ -309,6 +314,10 @@ public class MonkeySourceApeNative implements MonkeyEventSource {
         for (ImageWriterQueue writer : mImageWriters) {
             writer.tearDown();
         }
+    }
+
+    public long getLastReachedTime(){
+        return LAST_REACHED_TIME;
     }
 
     public boolean validate() {
@@ -491,6 +500,12 @@ public class MonkeySourceApeNative implements MonkeyEventSource {
         if (allow) {
             if (!this.currentActivity.equals(className)) {
                 this.currentActivity = className;
+                if(!activityHistory.contains(this.currentActivity)){
+                    //update endTime to one extra hour
+                    LAST_REACHED_TIME = SystemClock.elapsedRealtime();
+                    Logger.println("// found new activity at " + LAST_REACHED_TIME);
+                } 
+
                 activityHistory.add(this.currentActivity);
                 Logger.println("// current activity is " + this.currentActivity);
                 timestamp++;

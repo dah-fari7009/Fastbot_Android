@@ -176,4 +176,8 @@ public class MonkeySourceRandomScript implements MonkeyEventSource {
                               String stackTrace, String version) {
         return false;
     }
+
+    public long getLastReachedTime(){
+        return -1;
+    }
 }

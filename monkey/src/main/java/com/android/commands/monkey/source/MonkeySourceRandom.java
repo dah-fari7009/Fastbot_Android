@@ -147,6 +147,11 @@ public class MonkeySourceRandom implements MonkeyEventSource {
     private String appVersion = "";
     private String packageName = "";
 
+     /**
+     * last time an activity was reached
+     */
+    public static long LAST_REACHED_TIME = SystemClock.elapsedRealtime();
+
 
     public MonkeySourceRandom(Random random, List<ComponentName> MainApps, long throttle, boolean randomizeThrottle,
                               boolean permissionTargetSystem, File outputDirectory) {
@@ -176,6 +181,10 @@ public class MonkeySourceRandom implements MonkeyEventSource {
         mPermissionUtil.setTargetSystemPackages(permissionTargetSystem);
         getTotalAcitivities();
         mOutputDirectory = outputDirectory;
+    }
+
+    public long getLastReachedTime(){
+        return LAST_REACHED_TIME;
     }
 
     public static String getKeyName(int keycode) {
@@ -543,6 +552,11 @@ public class MonkeySourceRandom implements MonkeyEventSource {
         if (allow) {
             if (!this.currentactivity.equals(className)) {
                 this.currentactivity = className;
+                if(!activityHistory.contains(this.currentactivity)){
+                    //update endTime to one extra hour
+                    LAST_REACHED_TIME = SystemClock.elapsedRealtime();
+                    Logger.println("// found new activity at " + LAST_REACHED_TIME);
+                } 
                 activityHistory.add(this.currentactivity);
                 Logger.println(": debug, currentactivity is " + this.currentactivity);
             }
